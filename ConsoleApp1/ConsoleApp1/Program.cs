@@ -29,7 +29,7 @@ namespace ConsoleApp1
 
                 string frequencyfilepath = ConfigurationManager.AppSettings["freqyencyfilepath"];
 
-                string contents = File.ReadAllText(path);
+                StringBuilder contents = new StringBuilder(File.ReadAllText(path));
 
                 string pathword = ConfigurationManager.AppSettings["findwordfilepath"];
 
@@ -39,7 +39,11 @@ namespace ConsoleApp1
 
                 string csvpath = ConfigurationManager.AppSettings["csvfilepath"];
 
-                var dict = File.ReadLines(csvpath).Select(line => line.Split(',')).ToDictionary(line => line[0], line => line[1]);
+               
+
+                Dictionary<string,string> dict = File.ReadLines(csvpath).Select(line => line.Split(',')).ToDictionary(line => line[0], line => line[1]);
+            
+                
 
                 if (File.Exists(frequencyfilepath))
                 {
@@ -56,12 +60,15 @@ namespace ConsoleApp1
                         string cCriteria = @"\b" + wordlist[k] + @"\b";
                         System.Text.RegularExpressions.Regex oRegex = new System.Text.RegularExpressions.Regex(cCriteria, RegexOptions.IgnoreCase);
 
-                        int count = oRegex.Matches(contents).Count;
+                        int count = oRegex.Matches(contents.ToString()).Count;
 
                         sw.WriteLine((string.Format("{0},{1},{2}", wordlist[k], dict[wordlist[k].ToString()], count)));
                         sw.Flush();
                         //Regex regexText = new Regex("respecter", RegexOptions.IgnoreCase);
-                        contents = Regex.Replace(contents, wordlist[k], dict[wordlist[k].ToString()], RegexOptions.IgnoreCase);
+                        string repcontents = Regex.Replace(contents.ToString(), wordlist[k], dict[wordlist[k].ToString()], RegexOptions.IgnoreCase);
+
+                        contents.Clear().Append(repcontents);
+
 
                     }
                 }
